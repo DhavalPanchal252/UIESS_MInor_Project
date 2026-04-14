@@ -47,9 +47,6 @@ torch.manual_seed(opt.seed)
 if cuda:
     torch.cuda.manual_seed(opt.seed)
     cudnn.benchmark = True
-    device = torch.device('cuda')
-else:
-    device = torch.device('cpu')
 
 Tensor = torch.cuda.FloatTensor if cuda else torch.Tensor
 
@@ -62,8 +59,8 @@ def test_REAL_image(epoch):
         transforms.ToTensor(),
     ]
     enhancedValDataset = EnhancedValDataset(transforms_=transforms_val, dataset_path=opt.test_dir)
-    # enhancedValDataset.files += [os.path.join(r'D:\Underwater\UIEB\challenging-60', x) for x in
-    #                               os.listdir(r'D:\Underwater\UIEB\challenging-60') if is_image_file(x)]
+    enhancedValDataset.files += [os.path.join(r'D:\Underwater\UIEB\challenging-60', x) for x in
+                                  os.listdir(r'D:\Underwater\UIEB\challenging-60') if is_image_file(x)]
     val_dataloader = DataLoader(enhancedValDataset,
                                 batch_size=1,
                                 shuffle=False,
@@ -86,7 +83,7 @@ def test_REAL_image(epoch):
         with torch.no_grad():
             # Create copies of image
             XReal = imgReal
-            XReal = Variable(XReal.type(Tensor)).to(device)
+            XReal = Variable(XReal.type(Tensor)).cuda()
 
             # Generate samples
             start = time.time()
@@ -141,7 +138,7 @@ def test_SYN_image():
         with torch.no_grad():
             # Create copies of image
             XSyn = imgSyn
-            XSyn = Variable(XSyn.type(Tensor)).to(device)
+            XSyn = Variable(XSyn.type(Tensor)).cuda()
 
             # Generate samples
             start = time.time()
@@ -190,9 +187,9 @@ def test_plot_latent_tsne():
         with torch.no_grad():
             # Create copies of image
             XReal = imgReal
-            XReal = Variable(XReal.type(Tensor)).to(device)
+            XReal = Variable(XReal.type(Tensor)).cuda()
             XSyn = imgSyn
-            XSyn = Variable(XSyn.type(Tensor)).to(device)
+            XSyn = Variable(XSyn.type(Tensor)).cuda()
 
             # Generate samples
             s_code_Real = real_sty_Enc(XReal)
@@ -250,13 +247,13 @@ def test_latent_manipulation():
         if new_w != w or new_h != h:
             img = img.resize((new_w, new_h))
 
-        img = transforms_val(img).to(device).unsqueeze(0)
+        img = transforms_val(img).cuda().unsqueeze(0)
         item_list = []
         img_enhanceds = None
         with torch.no_grad():
             # Create copies of image
             X = img
-            X = Variable(X.type(Tensor)).to(device)
+            X = Variable(X.type(Tensor)).cuda()
 
             # Generate samples
             c_code, s_code_ori = c_Enc(X), real_sty_Enc(X)
@@ -305,10 +302,10 @@ def test_samples():
                 with torch.no_grad():
                     # Create copies of image
                     XReal = imgReal.unsqueeze(0)
-                    XReal = Variable(XReal.type(Tensor)).to(device)
+                    XReal = Variable(XReal.type(Tensor)).cuda()
 
                     XSyn = imgSyn.unsqueeze(0)
-                    XSyn = Variable(XSyn.type(Tensor)).to(device)
+                    XSyn = Variable(XSyn.type(Tensor)).cuda()
 
                     # Generate samples
                     c_code_Real, s_code_Real = c_Enc(XReal), real_sty_Enc(XReal)
@@ -333,13 +330,13 @@ def test_samples():
                     XSynSyn = G(c_code_Syn, s_code_Syn)
 
                     # Concatenate samples horisontally
-                    item_list = [XSynSyn, XSynReal, XSynRealSyn, enhanced_Syn, label_Syn.to(device).unsqueeze(0)]
-                    imgSyn = imgSyn.to(device).unsqueeze(0)
+                    item_list = [XSynSyn, XSynReal, XSynRealSyn, enhanced_Syn, label_Syn.cuda().unsqueeze(0)]
+                    imgSyn = imgSyn.cuda().unsqueeze(0)
                     for item in item_list:
                         imgSyn = torch.cat((imgSyn, item), -1)
 
                     item_list = [XRealReal, XRealSyn, XRealSynReal, enhanced_Real]
-                    imgReal = imgReal.to(device).unsqueeze(0)
+                    imgReal = imgReal.cuda().unsqueeze(0)
                     for item in item_list:
                         imgReal = torch.cat((imgReal, item), -1)
 
@@ -382,21 +379,13 @@ if __name__ == '__main__':
         real_sty_Enc = real_sty_Enc.cuda()
         syn_sty_Enc = syn_sty_Enc.cuda()
         T = T.cuda()
-    else:
-        c_Enc = c_Enc.to(device)
-        G = G.to(device)
-        real_sty_Enc = real_sty_Enc.to(device)
-        syn_sty_Enc = syn_sty_Enc.to(device)
-        T = T.to(device)
     # for epoch in range(25, 36):
         # Load pretrained models
-        # Load pretrained models with map_location for CPU support if needed
-        map_location = device if not cuda else None
-        c_Enc.load_state_dict(torch.load("saved_models/%s/c_Enc_29.pth" % opt.exp_name, map_location=map_location))
-        G.load_state_dict(torch.load("saved_models/%s/G_29.pth" % opt.exp_name, map_location=map_location))
-        real_sty_Enc.load_state_dict(torch.load("saved_models/%s/real_sty_Enc_29.pth" % opt.exp_name, map_location=map_location))
-        syn_sty_Enc.load_state_dict(torch.load("saved_models/%s/syn_sty_Enc_29.pth" % opt.exp_name, map_location=map_location))
-        T.load_state_dict(torch.load("saved_models/%s/T_29.pth" % opt.exp_name, map_location=map_location))
+        c_Enc.load_state_dict(torch.load("saved_models/%s/c_Enc_29.pth" % opt.exp_name))
+        G.load_state_dict(torch.load("saved_models/%s/G_29.pth" % opt.exp_name))
+        real_sty_Enc.load_state_dict(torch.load("saved_models/%s/real_sty_Enc_29.pth" % opt.exp_name))
+        syn_sty_Enc.load_state_dict(torch.load("saved_models/%s/syn_sty_Enc_29.pth" % opt.exp_name))
+        T.load_state_dict(torch.load("saved_models/%s/T_29.pth" % opt.exp_name))
 
         # c_Enc.load_state_dict(torch.load("saved_models/%s/c_Enc_%d.pth" % (opt.exp_name, epoch)))
         # G.load_state_dict(torch.load("saved_models/%s/G_%d.pth" % (opt.exp_name, epoch)))

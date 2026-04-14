@@ -1,6 +1,0 @@
-torch
-torchvision
-matplotlib
-pillow
-seaborn
-scikit-learn

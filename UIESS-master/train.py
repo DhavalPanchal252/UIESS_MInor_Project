@@ -53,12 +53,6 @@ def set_seed(seed, cuda):
         torch.cuda.manual_seed_all(seed)
         torch.backends.cudnn.benchmark = False
         torch.backends.cudnn.deterministic = True
-    else:
-        # torch.backends.cudnn is not available on CPU
-        pass
-    
-    global device
-    device = torch.device('cuda' if cuda else 'cpu')
 
 
 def worker_init(seed):
@@ -86,11 +80,6 @@ def train():
         tv_loss = tv_loss.cuda()
         perceptual_loss = perceptual_loss.cuda()
         # dcp_loss = dcp_loss.cuda()
-    else:
-        criterion_recon = criterion_recon.to(device)
-        ssim_loss = ssim_loss.to(device)
-        tv_loss = tv_loss.to(device)
-        perceptual_loss = perceptual_loss.to(device)
 
 
     # Initialize encoders, generators and discriminators
@@ -109,24 +98,15 @@ def train():
         T = T.cuda()
         D = D.cuda()
         criterion_recon.cuda()
-    else:
-        c_Enc = c_Enc.to(device)
-        G = G.to(device)
-        real_sty_Enc = real_sty_Enc.to(device)
-        syn_sty_Enc = syn_sty_Enc.to(device)
-        T = T.to(device)
-        D = D.to(device)
-        criterion_recon.to(device)
 
     if opt.epoch != 0:
         # Load pretrained models
-        map_location = device if not cuda else None
-        c_Enc.load_state_dict(torch.load("saved_models/%s/c_Enc_%d.pth" % (opt.exp_name, opt.epoch), map_location=map_location))
-        G.load_state_dict(torch.load("saved_models/%s/G_%d.pth" % (opt.exp_name, opt.epoch), map_location=map_location))
-        real_sty_Enc.load_state_dict(torch.load("saved_models/%s/real_sty_Enc_%d.pth" % (opt.exp_name, opt.epoch), map_location=map_location))
-        syn_sty_Enc.load_state_dict(torch.load("saved_models/%s/syn_sty_Enc_%d.pth" % (opt.exp_name, opt.epoch), map_location=map_location))
-        T.load_state_dict(torch.load("saved_models/%s/T_%d.pth" % (opt.exp_name, opt.epoch), map_location=map_location))
-        D.load_state_dict(torch.load("saved_models/%s/D_%d.pth" % (opt.exp_name, opt.epoch), map_location=map_location))
+        c_Enc.load_state_dict(torch.load("saved_models/%s/c_Enc_%d.pth" % (opt.exp_name, opt.epoch)))
+        G.load_state_dict(torch.load("saved_models/%s/G_%d.pth" % (opt.exp_name, opt.epoch)))
+        real_sty_Enc.load_state_dict(torch.load("saved_models/%s/real_sty_Enc_%d.pth" % (opt.exp_name, opt.epoch)))
+        syn_sty_Enc.load_state_dict(torch.load("saved_models/%s/syn_sty_Enc_%d.pth" % (opt.exp_name, opt.epoch)))
+        T.load_state_dict(torch.load("saved_models/%s/T_%d.pth" % (opt.exp_name, opt.epoch)))
+        D.load_state_dict(torch.load("saved_models/%s/D_%d.pth" % (opt.exp_name, opt.epoch)))
 
     else:
         # Initialize weights
@@ -200,9 +180,9 @@ def train():
             with torch.no_grad():
                 # Create copies of image
                 XA = imgA.unsqueeze(0)
-                XA = Variable(XA.type(Tensor)).to(device)
+                XA = Variable(XA.type(Tensor)).cuda()
                 XB = imgB.unsqueeze(0)
-                XB = Variable(XB.type(Tensor)).to(device)
+                XB = Variable(XB.type(Tensor)).cuda()
 
                 c_code_A, s_code_A = c_Enc(XA), real_sty_Enc(XA)
                 c_code_B, s_code_B = c_Enc(XB), syn_sty_Enc(XB)
@@ -226,13 +206,13 @@ def train():
                 XBB = G(c_code_B, s_code_B)
 
                 # Concatenate samples horisontally
-                item_list = [XBB, XBA, XBAB, enhanced_B, label_B.to(device).unsqueeze(0)]
-                imgB = imgB.to(device).unsqueeze(0)
+                item_list = [XBB, XBA, XBAB, enhanced_B, label_B.cuda().unsqueeze(0)]
+                imgB = imgB.cuda().unsqueeze(0)
                 for item in item_list:
                     imgB = torch.cat((imgB, item), -1)
 
                 item_list = [XAA, XAB, XABA, enhanced_A]
-                imgA = imgA.to(device).unsqueeze(0)
+                imgA = imgA.cuda().unsqueeze(0)
                 for item in item_list:
                     imgA = torch.cat((imgA, item), -1)
 
@@ -242,9 +222,9 @@ def train():
                     (img_enhanceds_B, imgB), -2)
 
         save_image(img_enhanceds_A, "images/%s/%s_I2I_Enhanced_A.png" % (opt.exp_name, batches_done), nrow=5,
-                   normalize=True)
+                   normalize=True, range=(0, 1))
         save_image(img_enhanceds_B, "images/%s/%s_I2I_Enhanced_B.png" % (opt.exp_name, batches_done), nrow=5,
-                   normalize=True)
+                   normalize=True, range=(0, 1))
 
     # ----------
     #  Training
@@ -261,9 +241,9 @@ def train():
             optimizer_D1.zero_grad()
 
             # Set model input
-            XA = Variable(batch["Real"].type(Tensor)).to(device)
-            XB = Variable(batch["Syn"].type(Tensor)).to(device)
-            labelB = Variable(batch["label"].type(Tensor)).to(device)
+            XA = Variable(batch["Real"].type(Tensor))
+            XB = Variable(batch["Syn"].type(Tensor))
+            labelB = Variable(batch["label"].type(Tensor))
             # -------------------------------
             #  Train Encoders and Generators
             # -------------------------------

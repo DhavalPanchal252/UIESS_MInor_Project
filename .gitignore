@@ -22,6 +22,7 @@ __pycache__/
 
 # Large datasets (local)
 UIEB_Dataset/
+EUVP
 
 # Generated training data/evaluation assets
 UIESS-master/data/
