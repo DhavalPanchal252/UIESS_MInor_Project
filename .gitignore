@@ -1,0 +1,49 @@
+# Python environments
+.venv/
+venv/
+env/
+
+# Python cache/build
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.pytest_cache/
+.mypy_cache/
+
+# Logs and runtime files
+*.log
+*.tmp
+
+# Model checkpoints and training artifacts
+*.pth
+*.pt
+*.ckpt
+
+# Large datasets (local)
+UIEB_Dataset/
+
+# Generated training data/evaluation assets
+UIESS-master/data/
+UIESS-master/asset/
+UIESS-master/eval_results.txt
+UIESS-master/metrics.txt
+
+# Generated outputs and local runs
+images/output/
+images/debug_run/
+images/full_test/
+images/release/
+saved_models/
+UIESS-master/output/
+UIESS-master/saved_models/
+UIESS-master/images/
+
+# Local notes/papers
+*.xopp
+AIN.pdf
+IN.pdf
+Notes.pdf
+paper_2.pdf
+paper_2_annotated.pdf
+Domain_Adaptation_for_Underwater_Image_Enhancement.pdf
