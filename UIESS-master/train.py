@@ -15,7 +15,7 @@ from loss import SSIM, VGGPerceptualLoss, TVLoss, DCPLoss
 from models import *
 
 parser = argparse.ArgumentParser()
-parser.add_argument("--data_root", type=str, default=r'D:\scene_other\UNIT\DAUW', help="dataset")
+parser.add_argument("--data_root", type=str, default='./data', help="dataset")
 parser.add_argument("--epoch", type=int, default=0, help="epoch to start training from")
 parser.add_argument("--n_epochs", type=int, default=35, help="number of epochs of training")
 parser.add_argument("--exp_name", type=str, default="Refactor testing", help="name of the dataset")
@@ -75,11 +75,11 @@ def train():
     # dcp_loss = DCPLoss(1)
 
     if cuda:
-        criterion_recon = criterion_recon.cuda()
-        ssim_loss = ssim_loss.cuda()
-        tv_loss = tv_loss.cuda()
-        perceptual_loss = perceptual_loss.cuda()
-        # dcp_loss = dcp_loss.cuda()
+        criterion_recon = criterion_recon# REMOVE IT COMPLETELY
+        ssim_loss = ssim_loss# REMOVE IT COMPLETELY
+        tv_loss = tv_loss# REMOVE IT COMPLETELY
+        perceptual_loss = perceptual_loss# REMOVE IT COMPLETELY
+        # dcp_loss = dcp_loss# REMOVE IT COMPLETELY
 
 
     # Initialize encoders, generators and discriminators
@@ -91,13 +91,13 @@ def train():
     D = MultiDiscriminator()
 
     if cuda:
-        c_Enc = c_Enc.cuda()
-        G = G.cuda()
-        real_sty_Enc = real_sty_Enc.cuda()
-        syn_sty_Enc = syn_sty_Enc.cuda()
-        T = T.cuda()
-        D = D.cuda()
-        criterion_recon.cuda()
+        c_Enc = c_Enc# REMOVE IT COMPLETELY
+        G = G# REMOVE IT COMPLETELY
+        real_sty_Enc = real_sty_Enc# REMOVE IT COMPLETELY
+        syn_sty_Enc = syn_sty_Enc# REMOVE IT COMPLETELY
+        T = T# REMOVE IT COMPLETELY
+        D = D# REMOVE IT COMPLETELY
+        criterion_recon# REMOVE IT COMPLETELY
 
     if opt.epoch != 0:
         # Load pretrained models
@@ -180,9 +180,9 @@ def train():
             with torch.no_grad():
                 # Create copies of image
                 XA = imgA.unsqueeze(0)
-                XA = Variable(XA.type(Tensor)).cuda()
+                XA = Variable(XA.type(Tensor))# REMOVE IT COMPLETELY
                 XB = imgB.unsqueeze(0)
-                XB = Variable(XB.type(Tensor)).cuda()
+                XB = Variable(XB.type(Tensor))# REMOVE IT COMPLETELY
 
                 c_code_A, s_code_A = c_Enc(XA), real_sty_Enc(XA)
                 c_code_B, s_code_B = c_Enc(XB), syn_sty_Enc(XB)
@@ -206,13 +206,13 @@ def train():
                 XBB = G(c_code_B, s_code_B)
 
                 # Concatenate samples horisontally
-                item_list = [XBB, XBA, XBAB, enhanced_B, label_B.cuda().unsqueeze(0)]
-                imgB = imgB.cuda().unsqueeze(0)
+                item_list = [XBB, XBA, XBAB, enhanced_B, label_B.unsqueeze(0)]
+                imgB = imgB.unsqueeze(0)
                 for item in item_list:
                     imgB = torch.cat((imgB, item), -1)
 
                 item_list = [XAA, XAB, XABA, enhanced_A]
-                imgA = imgA.cuda().unsqueeze(0)
+                imgA = imgA.unsqueeze(0)
                 for item in item_list:
                     imgA = torch.cat((imgA, item), -1)
 
@@ -222,9 +222,9 @@ def train():
                     (img_enhanceds_B, imgB), -2)
 
         save_image(img_enhanceds_A, "images/%s/%s_I2I_Enhanced_A.png" % (opt.exp_name, batches_done), nrow=5,
-                   normalize=True, range=(0, 1))
+                   normalize=True)
         save_image(img_enhanceds_B, "images/%s/%s_I2I_Enhanced_B.png" % (opt.exp_name, batches_done), nrow=5,
-                   normalize=True, range=(0, 1))
+                   normalize=True)
 
     # ----------
     #  Training
