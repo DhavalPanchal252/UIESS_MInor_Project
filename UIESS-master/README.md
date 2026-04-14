@@ -2,7 +2,7 @@
 
 Official Code for the paper [Domain Adaptation for Underwater Image Enhancement via Content and Style Separation](https://arxiv.org/abs/2202.08537).
 <p align="center">
-  <img src="asset/demo.png" width="500"/>
+  <img src="Minor_Project/UIESS-master/asset/demo.png" width="500"/>
 </p>
 
 ## Introduction
