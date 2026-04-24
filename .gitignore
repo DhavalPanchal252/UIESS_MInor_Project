@@ -27,7 +27,6 @@ EUVP
 
 # Generated training data/evaluation assets
 UIESS-master/data/
-UIESS-master/asset/
 UIESS-master/eval_results.txt
 UIESS-master/metrics.txt
 
