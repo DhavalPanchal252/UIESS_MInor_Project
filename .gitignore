@@ -15,7 +15,7 @@ __pycache__/
 # Logs and runtime files
 *.log
 *.tmp
-
+UIESS-master.zip
 # Model checkpoints and training artifacts
 *.pth
 *.pt
