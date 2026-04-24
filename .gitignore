@@ -49,3 +49,13 @@ Notes.pdf
 paper_2.pdf
 paper_2_annotated.pdf
 Domain_Adaptation_for_Underwater_Image_Enhancement.pdf
+
+# Ignore all Jupyter Notebooks except version3
+*.ipynb
+!UIESS-master/version3.ipynb
+
+# Ignore agent markdown artifacts
+dataset_analysis.md
+implementation_plan.md
+walkthrough.md
+task.md

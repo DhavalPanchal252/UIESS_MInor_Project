@@ -62,20 +62,20 @@ class EnhancedDataset(Dataset):
         super(EnhancedDataset, self).__init__()
         self.transform = transforms.Compose(transforms_)
         if mode == 'train':
-            self.filesA = sorted([os.path.join(os.path.join(root, 'trainA'), x) for x in
-                                  os.listdir(os.path.join(root, 'trainA')) if is_image_file(x)])
-            self.filesB = sorted([os.path.join(os.path.join(root, 'trainB'), x) for x in
-                                  os.listdir(os.path.join(root, 'trainB')) if is_image_file(x)])
-            self.labelB = sorted([os.path.join(os.path.join(root, 'trainB_label'), x) for x in
-                                  os.listdir(os.path.join(root, 'trainB_label')) if is_image_file(x)])
+            self.filesA = [os.path.join(os.path.join(root, 'trainA'), x) for x in
+                           os.listdir(os.path.join(root, 'trainA')) if is_image_file(x)]
+            self.filesB = [os.path.join(os.path.join(root, 'trainB'), x) for x in
+                           os.listdir(os.path.join(root, 'trainB')) if is_image_file(x)]
+            self.labelB = [os.path.join(os.path.join(root, 'trainB_label'), x) for x in
+                           os.listdir(os.path.join(root, 'trainB_label')) if is_image_file(x)]
         else:
-            self.filesA = sorted([os.path.join(os.path.join(root, 'testA'), x) for x in
-                                  os.listdir(os.path.join(root, 'testA')) if is_image_file(x)])
+            self.filesA = [os.path.join(os.path.join(root, 'testA'), x) for x in
+                           os.listdir(os.path.join(root, 'testA')) if is_image_file(x)]
             # sorted(glob.glob( + "/*.*"))
-            self.filesB = sorted([os.path.join(os.path.join(root, 'testB'), x) for x in
-                                  os.listdir(os.path.join(root, 'testB')) if is_image_file(x)])
-            self.labelB = sorted([os.path.join(os.path.join(root, 'testB_label'), x) for x in
-                                  os.listdir(os.path.join(root, 'testB_label')) if is_image_file(x)])
+            self.filesB = [os.path.join(os.path.join(root, 'testB'), x) for x in
+                           os.listdir(os.path.join(root, 'testB')) if is_image_file(x)]
+            self.labelB = [os.path.join(os.path.join(root, 'testB_label'), x) for x in
+                           os.listdir(os.path.join(root, 'testB_label')) if is_image_file(x)]
 
         # if mode == 'train':
         #     self.filesA = [os.path.join(os.path.join(root, 'trainA_UIEBwithRUIE'), x) for x in  # _UIEBwithRUIE
